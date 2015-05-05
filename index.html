@@ -44,17 +44,27 @@
 <h4>
 <a id="sift特徵點" class="anchor" href="#sift%E7%89%B9%E5%BE%B5%E9%BB%9E" aria-hidden="true"><span class="octicon octicon-link"></span></a>SIFT特徵點</h4>
 
+<p>本專題利用上課講義提到的SIFT演算法尋找每個影像的特徵點，並參考Lowe的論文逐步實現計算過程。數學方面的運算則是直接使用OpenCV提供的<code>cv::gemm</code> 解方程式解。</p>
+
 <h4>
 <a id="focal-length估算" class="anchor" href="#focal-length%E4%BC%B0%E7%AE%97" aria-hidden="true"><span class="octicon octicon-link"></span></a>focal length估算</h4>
 
 <h4>
 <a id="特徵點匹配" class="anchor" href="#%E7%89%B9%E5%BE%B5%E9%BB%9E%E5%8C%B9%E9%85%8D" aria-hidden="true"><span class="octicon octicon-link"></span></a>特徵點匹配</h4>
 
+<p>本專題原本是想直接使用Flann裡面的kdtree來尋找兩個descriptor之間的關係。但是由於跟OpenCV中的Flann函式衝突，因此我們先將我們自己的descriptor格式轉成OpenCV的格式後，再將配對點算出。</p>
+
+<p>算出後的點，利用最小distance的兩倍作為閥值，將過度歪斜的匹配點予以刪除，得到最後的良好配對點。</p>
+
 <h4>
 <a id="image-warping" class="anchor" href="#image-warping" aria-hidden="true"><span class="octicon octicon-link"></span></a>Image Warping</h4>
 
 <h4>
-<a id="multiband-blending" class="anchor" href="#multiband-blending" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multiband blending</h4>
+<a id="multiresolution-spline-blending" class="anchor" href="#multiresolution-spline-blending" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multiresolution spline blending</h4>
+
+<p>本專題參考Multiresolution spline blending演算法來消除圖與圖之間連接時因色調不同而造成的違和感。首先將兩張耀接合的重疊區塊取出並製作這兩張圖的高斯金字塔，再利用高斯金字塔製作出拉普拉斯金字塔，拉普拉斯金字塔最小的為圖片的色彩資訊，而其他層為邊界的資訊，我們將色彩資訊做橫向的高斯加權，重疊中線以50%作為基準，如下圖所示。邊界的資訊則是直接以中線左右各取一半的資訊，最後再將拉普拉斯金字塔還原成合成影像並將兩張圖片重疊的區域替換掉。</p>
+
+<p><a href="http://i.imgur.com/mkizo9y.png">Imgur</a></p>
 
 <h4>
 <a id="結果" class="anchor" href="#%E7%B5%90%E6%9E%9C" aria-hidden="true"><span class="octicon octicon-link"></span></a>結果</h4>
@@ -72,6 +82,12 @@
 
 <h3>
 <a id="reference" class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h3>
+
+<ol>
+<li>課程講義</li>
+<li>David G. Lowe, Distinctive Image Features from Scale-Invariant Keypoints. Computer Science Department of University of British Columbia. (2004)</li>
+<li>Peter J. BURT, Edward H. ADELSON, A Multiresolution Spline With Application to Image Mosaics. ACM Transactions on Grphics, Vol. 2. No. 4, 1983: 217-236</li>
+</ol>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/KKyang/IMGSTCHHW2">Stitching Images</a> is maintained by <a href="https://github.com/KKyang">KKyang</a>.</span>
