@@ -49,6 +49,8 @@
 <h4>
 <a id="focal-length估算" class="anchor" href="#focal-length%E4%BC%B0%E7%AE%97" aria-hidden="true"><span class="octicon octicon-link"></span></a>focal length估算</h4>
 
+<p>因為從exif讀出的資訊為原始照片尺寸下的focal length，且單位為mm。之前在撰寫程式時曾經因為改變圖片大小而導致在像素下的focal length值一同改變，因此我們直接將focal length資訊利用OpenCV的focal length estimation，以數張SIFT特徵點去推出該大小下的focal length。</p>
+
 <h4>
 <a id="特徵點匹配" class="anchor" href="#%E7%89%B9%E5%BE%B5%E9%BB%9E%E5%8C%B9%E9%85%8D" aria-hidden="true"><span class="octicon octicon-link"></span></a>特徵點匹配</h4>
 
