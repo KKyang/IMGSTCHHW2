@@ -3,7 +3,7 @@ NTU VFX Project 2
 
 ## Github Page
 
-NOT YET :)
+http://kkyang.github.io/IMGSTCHHW2
 
 ## 程式用法
 
