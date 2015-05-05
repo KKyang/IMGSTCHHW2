@@ -103,7 +103,7 @@ void MainWindow::on_pushButton_startStitch_clicked()
     ui->pushButton_startStitch->setEnabled(false);
     //QtConcurrent copies the content of the parameters (pass-by-value). Use std::ref() to pass-by-reference (C++ 11 up only)
 #ifdef _DEBUG
-    stitch.process(filenames, images, result);
+    //stitch.process(filenames, images, result);
 #else
     QFuture<void> future = QtConcurrent::run(&this->stitch, &myStitch::process, filenames, images, std::ref(result));
     watcher.setFuture(future);

@@ -128,6 +128,7 @@ void estimate::drawMatches(cv::Mat &img1, std::vector<featurePoints> &f1, cv::Ma
         cv::circle(plate, two, 2, cv::Scalar(0, 0, 255), -1, 8);
         cv::line(plate, one, two, cv::Scalar(rand() % 256, rand() % 256, rand() % 256), 2, 8);
     }
+    cv::imwrite("sift.png", plate);
 }
 
 void estimate::alignMatches(cv::Mat &img1, std::vector<featurePoints> &f1, cv::Mat &img2, std::vector<featurePoints> &f2, std::vector<cv::DMatch> good_matches,
