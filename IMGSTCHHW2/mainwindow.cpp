@@ -92,6 +92,9 @@ void MainWindow::on_actionSave_triggered()
         return;
 
     QString name = QFileDialog::getSaveFileName(this, "Save Panorama");
+    if(name.isEmpty())
+        return;
+
     cv::imwrite(name.toStdString(), result);
 }
 
