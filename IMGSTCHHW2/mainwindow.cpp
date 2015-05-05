@@ -29,7 +29,7 @@ MainWindow::~MainWindow()
 void MainWindow::returnResult()
 {
     ui->pushButton_startStitch->setEnabled(true);
-    ui->graphicsView_result->initialize(1, result.cols, result.rows);
+    ui->graphicsView_result->initialize(1, result.cols, result.rows,1);
     ui->graphicsView_result->setImage(result);
 }
 
@@ -92,9 +92,6 @@ void MainWindow::on_actionSave_triggered()
         return;
 
     QString name = QFileDialog::getSaveFileName(this, "Save Panorama");
-    if(name.isEmpty())
-        return;
-
     cv::imwrite(name.toStdString(), result);
 }
 

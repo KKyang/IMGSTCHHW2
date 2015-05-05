@@ -10,11 +10,7 @@
 class GetF
 {
 public:
-    //GetF();
-    void getFocalL(QStringList &list,std::vector<double> &focalL);
     void warping(std::vector<cv::Mat> &inputArrays,std::vector<double> FL2,std::vector<cv::Mat> &Output,std::vector<cv::Point> &upedge,std::vector<cv::Point> &downedge);
-
-    //std::vector<cv::Mat> warping(std::vector<cv::Mat> &inputArrays,std::vector<double>FL2);
 private:
     std::vector<double> FocalL;
 

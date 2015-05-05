@@ -71,7 +71,6 @@ void myStitch::process(QStringList &filenames, std::vector<cv::Mat> &inputArrays
     for(int i = 0; i < warpingImg.size() - 1; i++)
     {
         sendProgress(QString("Blending images (Pair: " + QString::number(i + 1) + " / " + QString::number(inputArrays.size() - 1) + ")"), 90 + (int)(5.0 * ((double)(k - 1) / inputArrays.size())));
-        //blend.multiBandBlend(warpingImg[i], warpingImg[i + 1], dx[i], dy[i]);
         int dyy;
         if(dy[i] > warpingImg[i].rows)
         {
@@ -87,10 +86,8 @@ void myStitch::process(QStringList &filenames, std::vector<cv::Mat> &inputArrays
 
     sendProgress(QString("Writing images into panorama"), 95);
     cv::Mat left;
-    //    int max_rows = warpingImg[0].rows;
     int cols = 0;
     int rows = 0;
-    int min_dy=dy[0];
     for(int i = 0; i < warpingImg.size(); i++)
     {
         if( i != warpingImg.size() - 1)
@@ -112,27 +109,31 @@ void myStitch::process(QStringList &filenames, std::vector<cv::Mat> &inputArrays
         else
             cols += warpingImg[i].cols;
     }
-    //cv::Size size(cols , max_rows);
 
 
 
     cv::Mat result;
-    cv::Size size(cols,rows);
-    //qDebug()<<cols<<" "<<rows;
+    cv::Size size(cols,rows*2);
     result.create(size,CV_MAKETYPE(left.depth(),3));
     result = cv::Scalar::all(0);
-    //qDebug()<<"here  ha ha "<<(result.rows-min_dy)/2;
-    left = result(cv::Rect(0,0,warpingImg[0].cols,warpingImg[0].rows));
-    //qDebug()<<"@@";
+    left = result(cv::Rect(0,warpingImg[0].rows/10,warpingImg[0].cols,warpingImg[0].rows+warpingImg[0].rows/10));
     warpingImg[0].copyTo(left);
     int distance = 0;
-    int distancey = 0;
-    //qDebug()<<"@@@";
+    int distancey = warpingImg[0].rows/10;
+    //cv::Point uppoint;
+    double minb = warpingImg[0].rows/2;
+    double mina = warpingImg[0].cols/2;
+    double maxb = warpingImg[0].rows/2;
+    double maxa = warpingImg[0].cols/2;
+    double upb = 0.0;
+    double upa = 0.0;
+    double downb = 0.0;
+    double downa = 0.0;
+
+
     for(int i =1;i<=dx.size();i++)
     {
         distance = distance + warpingImg[i-1].cols - dx[i-1];
-        qDebug()<<" distancey " <<distancey<< " dy "<<dy[i-1] ;
-        //dy[i-1] = 635;
         if(dy[i-1]>warpingImg[i-1].rows)
         {
             distancey = distancey -abs(warpingImg[i-1].rows - dy[i-1]);
@@ -141,10 +142,11 @@ void myStitch::process(QStringList &filenames, std::vector<cv::Mat> &inputArrays
         {
             distancey = distancey +abs(warpingImg[i-1].rows- dy[i-1]);
         }
+
+
         for(int b = distancey; b < distancey+warpingImg[i].rows; b++)
         {
-//        for(int b = 0; b < warpingImg[i].rows; b++)
-//        {
+
             for(int a = distance; a < warpingImg[i].cols+distance; a++)
             {
                 if(b<0)
@@ -155,27 +157,167 @@ void myStitch::process(QStringList &filenames, std::vector<cv::Mat> &inputArrays
                 {
                     if(result.at<cv::Vec3b>(b, a)[0] == 0 && result.at<cv::Vec3b>(b, a)[1] == 0 && result.at<cv::Vec3b>(b, a)[2] == 0)
                     {
-                        //qDebug()<<b<<" " <<b-distancey;
                         if(b-distancey>=0 && b-distancey<warpingImg[i].rows && a-distance>=0 && a-distance<warpingImg[i].cols )
                         {
-//                        if(a-distance>=0 && a-distance<warpingImg[i].cols )
-//                        {
-//                            result.at<cv::Vec3b>(b, a)[0] = warpingImg[i].at<cv::Vec3b>(b-distancey,a-distance)[0];
-//                            result.at<cv::Vec3b>(b, a)[1] = warpingImg[i].at<cv::Vec3b>(b-distancey,a-distance)[1];
-//                            result.at<cv::Vec3b>(b, a)[2] = warpingImg[i].at<cv::Vec3b>(b-distancey,a-distance)[2];
                             result.at<cv::Vec3b>(b, a)[0] = warpingImg[i].at<cv::Vec3b>(b-distancey,a-distance)[0];
                             result.at<cv::Vec3b>(b, a)[1] = warpingImg[i].at<cv::Vec3b>(b-distancey,a-distance)[1];
                             result.at<cv::Vec3b>(b, a)[2] = warpingImg[i].at<cv::Vec3b>(b-distancey,a-distance)[2];
                         }
                     }
+                    if(b < minb)
+                    {
+                        minb = b;
+                        mina = a;
+                        upb =b;
+                        upa = a;
+                    }
+                    if(b>maxb)
+                    {
+                        maxb = b;
+                        maxa = a;
+                        downb = b-warpingImg[i].rows;
+                        downa = a;
+                    }
                 }
             }
         }
-        qDebug()<< "distancey " <<distancey;
+    }
+#ifdef _DEBUG
+    qDebug()<< minb << mina << maxb << maxa;
+#endif
+    cv::Mat rotateImg;
+    //rotateImg.create(cv::Size(),CV_MAKETYPE(rotateImg.depth(),3);
+    //result.create(size,CV_MAKETYPE(left.depth(),3));
+    double angle = atan((upb-downb)/(upa-downa))*180/3.14159;
+    if(upa == downa)
+    {
+        angle = 0;
     }
 
+    cv::Point2f pt(result.cols/2,result.rows/2);
+    cv::Mat r = cv::getRotationMatrix2D(pt,angle,1.0);
+    cv::warpAffine(result,rotateImg,r,cv::Size(result.cols,result.rows));
+
+    int upline =0;
+    int downline=result.rows;
+    for(int b= 0;b<rotateImg.rows;b++)
+    {
+        int upn = 0;
+        int downn = 0;
+        for(int a=0;a<rotateImg.cols;a++)
+        {
+            if(rotateImg.at<cv::Vec3b>(b, a)[0] == 0 && rotateImg.at<cv::Vec3b>(b, a)[1] == 0 && rotateImg.at<cv::Vec3b>(b, a)[2] == 0)
+            {
+                if(b<rotateImg.rows/2)
+                {
+                    upn++;
+                    if(upn == rotateImg.cols  && upline < b )
+                    {
+                        upline = b;
+                    }
+                }
+                else
+                {
+                    downn++;
+                    if(downn == rotateImg.cols  && downline >b)
+                    {
+                        downline = b;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    cv::Mat cutImage;
+    int finalrows = downline - upline+1;
+    int finalcols = rotateImg.cols;
+    cv::Size sizefinal(finalcols,finalrows);
+    cutImage.create(sizefinal,CV_MAKETYPE(rotateImg.depth(),3));
+    cutImage = cv::Scalar::all(0);
+#ifdef _DEBUG
+    qDebug()<<result.rows<<finalrows<<result.cols<<finalcols;
+#endif
+    for(int b = 0; b < cutImage.rows; b++)
+    {
+        for(int a = 0; a < cutImage.cols; a++)
+        {
+            //qDebug()<<b+minb<<a;
+            if(b +upline >= rotateImg.rows){}
+            else
+            {
+                cutImage.at<cv::Vec3b>(b, a)[0] = rotateImg.at<cv::Vec3b>(b+upline,a)[0];
+                cutImage.at<cv::Vec3b>(b, a)[1] = rotateImg.at<cv::Vec3b>(b+upline,a)[1];
+                cutImage.at<cv::Vec3b>(b, a)[2] = rotateImg.at<cv::Vec3b>(b+upline,a)[2];
+            }
+        }
+    }
+
+
+
+    int leftline =0;
+    int rightline=cutImage.cols;
+    for(int a= 0;a<cutImage.cols;a++)
+    {
+        int leftn = 0;
+        int rightn = 0;
+        for(int b=0;b<cutImage.rows;b++)
+        {
+            if(cutImage.at<cv::Vec3b>(b, a)[0] == 0 && cutImage.at<cv::Vec3b>(b, a)[1] == 0 && cutImage.at<cv::Vec3b>(b, a)[2] == 0)
+            {
+                if(a<cutImage.cols/2)
+                {
+                    leftn++;
+                    if(leftn == cutImage.rows  && leftline < a )
+                    {
+                        leftline = a;
+                    }
+                }
+                else
+                {
+                    rightn++;
+                    if(rightn == cutImage.rows  && rightline >a)
+                    {
+                        rightline = a;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    cv::Mat cutImage2;
+    int finalrows2 = cutImage.rows;
+    int finalcols2 = rightline-leftline;
+    cv::Size sizefinal2(finalcols2,finalrows2);
+    cutImage2.create(sizefinal2,CV_MAKETYPE(cutImage.depth(),3));
+    cutImage2 = cv::Scalar::all(0);
+#ifdef _DEBUG
+    qDebug()<<result.rows<<finalrows2<<result.cols<<finalcols2;
+#endif
+    for(int b = 0; b < cutImage2.rows; b++)
+    {
+        for(int a = 0; a < cutImage2.cols; a++)
+        {
+            //qDebug()<<b+minb<<a;
+            if(a+leftline >= cutImage.cols){}
+            else
+            {
+                cutImage2.at<cv::Vec3b>(b, a)[0] = cutImage.at<cv::Vec3b>(b,a+leftline)[0];
+                cutImage2.at<cv::Vec3b>(b, a)[1] = cutImage.at<cv::Vec3b>(b,a+leftline)[1];
+                cutImage2.at<cv::Vec3b>(b, a)[2] = cutImage.at<cv::Vec3b>(b,a+leftline)[2];
+            }
+        }
+    }
+
+
+
+
+
     outputArray.release();
-    outputArray = result.clone();
+    outputArray = cutImage2.clone();
     sendProgress(QString("Done"), 100);
 }
 
@@ -663,8 +805,6 @@ void myStitch::descriptor(std::vector<featurePoints> &f, std::vector<cv::Mat> &_
 
                 }
             }
-
-        /////////////////////////////////////////
         //norm
         double tmp = 0;
         for(int j = 0; j < 4; j++)

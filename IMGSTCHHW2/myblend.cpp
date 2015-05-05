@@ -6,7 +6,6 @@ myBlend::myBlend()
 
 void myBlend::multiBandBlend(cv::Mat &limg, cv::Mat &rimg, int dx, int dy)
 {
-    qDebug() << "dy" << dy;
     if(dx % 2 == 0)
     {
         if(dx + 1 <= limg.cols && dx + 1 <=rimg.cols)
@@ -89,7 +88,6 @@ void myBlend::multiBandBlend(cv::Mat &limg, cv::Mat &rimg, int dx, int dy)
     }
 
     result = LS[0].clone();
-    //cv::imshow("123",LS);
 
     blendImg(limg, result, dx, dy, LEFT);
     blendImg(rimg, result, dx, dy, RIGHT);
@@ -130,15 +128,14 @@ cv::Mat myBlend::getGaussianKernel(int x, int y, int dx, int dy)
 
 void myBlend::buildLaplacianMap(cv::Mat &inputArray, std::vector<cv::Mat> &outputArrays, int dx, int dy, int lr)
 {
-    //cv::Mat tmp(cv::Size(dx, dy, CV_8UC3);
+
     cv::Mat tmp(cv::Size(dx, abs(dy)), CV_8UC3);
-//    qDebug() << "dy" << dy;
+
 
     int disx = (lr == RIGHT) ? 0 : (inputArray.cols - dx);
-//    int disy = dy >= 0 ? ((lr == RIGHT) ? 0 : (inputArray.rows - dy)) : ((lr == RIGHT) ? (inputArray.rows - dy) : 0);
     int disy = dy >= 0 ? ((lr == RIGHT) ? 0 : (inputArray.rows - dy)) : ((lr == RIGHT) ? (inputArray.rows + dy) : 0);
 
-    //if(disy < 0){disy = 0;}
+
     if(disx < 0){disx = 0;}
 
     for(int j = 0; j < tmp.rows; j++)
@@ -152,7 +149,6 @@ void myBlend::buildLaplacianMap(cv::Mat &inputArray, std::vector<cv::Mat> &outpu
             }
         }
     }
-    //cv::imshow("test", tmp);
     cv::waitKey();
     tmp.convertTo(tmp, CV_32FC3);
 
@@ -206,6 +202,4 @@ void myBlend::blendImg(cv::Mat &inputArray, cv::Mat &overlap_area, int dx, int d
             }
         }
     }
-    //cv::imshow("bla", inputArray);
-    //cv::waitKey();
 }
