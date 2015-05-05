@@ -66,7 +66,7 @@
 
 <p>本專題參考Multiresolution spline blending演算法來消除圖與圖之間連接時因色調不同而造成的違和感。首先將兩張耀接合的重疊區塊取出並製作這兩張圖的高斯金字塔，再利用高斯金字塔製作出拉普拉斯金字塔，拉普拉斯金字塔最小的為圖片的色彩資訊，而其他層為邊界的資訊，我們將色彩資訊做橫向的高斯加權，重疊中線以50%作為基準，如下圖所示。邊界的資訊則是直接以中線左右各取一半的資訊，最後再將拉普拉斯金字塔還原成合成影像並將兩張圖片重疊的區域替換掉。</p>
 
-<p><a href="http://i.imgur.com/mkizo9y.png">Imgur</a></p>
+<p><img src="http://i.imgur.com/mkizo9y.png" alt="Imgur"></p>
 
 <h4>
 <a id="結果" class="anchor" href="#%E7%B5%90%E6%9E%9C" aria-hidden="true"><span class="octicon octicon-link"></span></a>結果</h4>
