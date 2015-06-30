@@ -130,6 +130,16 @@ void myStitch::process(QStringList &filenames, std::vector<cv::Mat> &inputArrays
     double downb = 0.0;
     double downa = 0.0;
 
+    for(int b = distancey; b < distancey+warpingImg[0].rows; b++)
+        for(int a = distance; a < warpingImg[0].cols+distance; a++)
+        {
+            if(b-distancey>=0 && b-distancey<warpingImg[0].rows && a-distance>=0 && a-distance<warpingImg[0].cols )
+            {
+                result.at<cv::Vec3b>(b, a)[0] = warpingImg[0].at<cv::Vec3b>(b-distancey,a-distance)[0];
+                result.at<cv::Vec3b>(b, a)[1] = warpingImg[0].at<cv::Vec3b>(b-distancey,a-distance)[1];
+                result.at<cv::Vec3b>(b, a)[2] = warpingImg[0].at<cv::Vec3b>(b-distancey,a-distance)[2];
+            }
+        }
 
     for(int i =1;i<=dx.size();i++)
     {
